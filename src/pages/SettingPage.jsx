@@ -26,6 +26,15 @@ institution_phone: "",
 institution_address: "",
 student_id_prefix: "STU",
 email_notifications: true,
+
+
+  // Admin Details
+  admin_name: "",
+  admin_email: "",
+  admin_phone: "",
+  admin_role: "Administrator",
+  admin_avatar: "",
+
 });
 
 useEffect(() => {
@@ -71,10 +80,7 @@ setLoading(true);
 } finally {
   setLoading(false);
 }
-
-
 };
-
 if (fetching) {
 return ( <div className="h-screen flex items-center justify-center"> <Loader2
        className="animate-spin text-blue-600"
@@ -82,7 +88,6 @@ return ( <div className="h-screen flex items-center justify-center"> <Loader2
      /> </div>
 );
 }
-
 return ( <div className="min-h-screen bg-gray-50">
 
   {/* Header */}
@@ -129,7 +134,7 @@ return ( <div className="min-h-screen bg-gray-50">
           </>
         )}
       </button>
-
+      
     </div>
 
   </div>
@@ -292,7 +297,49 @@ return ( <div className="min-h-screen bg-gray-50">
 
     </div>
 
+
+
+    {/* Notifications Section */}
+    <div className="bg-white border rounded-2xl p-6">
+
+      <div className="flex items-center justify-between">
+
+        <div>
+          <h3 className="font-medium">
+            SMS Notifications
+          </h3>
+
+          <p className="text-sm text-gray-500">
+            Receive updates and alerts by sms
+          </p>
+        </div>
+
+        <label className="relative inline-flex items-center cursor-pointer">
+
+          <input
+            type="checkbox"
+            name="sms_notifications"
+            checked={settings.sms_notifications}
+            onChange={handleChange}
+            className="sr-only peer"
+          />
+          <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 after:absolute after:left-[2px] after:top-[2px] after:bg-white after:h-5 after:w-5 after:rounded-full after:transition-all peer-checked:after:translate-x-full">
+          </div>
+
+        </label>
+
+      </div>
+
+    </div>
+
   </div>
+
+  
+
+
+
+
+
 
 </div>
 

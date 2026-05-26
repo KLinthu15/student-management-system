@@ -472,16 +472,16 @@ export default function CoursesPage() {
                 />
 
                 <input
-                  className="border p-2 w-full rounded"
-                  placeholder="PDFs (comma separated)"
-                  value={formData.pdfs}
+                  type="file"
+                  accept="image/*"
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      pdfs:
-                        e.target.value,
+                      profile_image_file:
+                        e.target.files[0],
                     })
                   }
+                  className="border rounded-xl px-4 py-3 md:col-span-2"
                 />
 
                 <input
