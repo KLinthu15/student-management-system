@@ -93,6 +93,8 @@
 // }
 
 
+
+
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
@@ -137,13 +139,6 @@ export default function LandingPage() {
             </h1>
           </motion.div>
 
-          {/* NAV BUTTON */}
-          <Link
-            to="/admin/login"
-            className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition border border-white/10"
-          >
-            Login
-          </Link>
         </div>
       </nav>
 

@@ -27,9 +27,7 @@ export default function AdminLayout() {
     { title: "Courses", icon: BookOpen, path: "/admin/courses" },
     { title: "Attendance", icon: CalendarCheck, path: "/admin/attendance" },
     { title: "Results", icon: FileBarChart2, path: "/admin/results" },
-    // { title: "Notifications", icon: Bell, path: "/admin/notifications" },
-    { title: "Settings", icon: Settings, path: "/admin/settings" },
-    { title: "Assignment", icon: BookOpen , path: "/admin/assignment" },
+    { title: "Settings", icon: Settings, path: "/admin/settings" }
   ];
 
   return (

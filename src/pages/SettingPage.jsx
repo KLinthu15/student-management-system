@@ -1,347 +1,452 @@
 
-import { useEffect, useState } from "react";
+// ======================================================
+// MODERN SETTINGS PAGE WITH EMAIL CHANGE
+// FILE: SettingsPage.jsx
+// ======================================================
+
+import { useState } from "react";
+
+import { motion } from "framer-motion";
+
 import axios from "axios";
+
 import {
-Building2,
-Mail,
-Phone,
-MapPin,
-Users,
-Bell,
-Save,
-Loader2,
-Settings,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  Shield,
+  Save,
+  UserCog,
 } from "lucide-react";
 
-const API_URL = "http://localhost:5001/api/settings";
+import {
+  successToast,
+  errorToast,
+} from "../untils/toast.js";
 
 export default function SettingsPage() {
-const [loading, setLoading] = useState(false);
-const [fetching, setFetching] = useState(true);
 
-const [settings, setSettings] = useState({
-institution_name: "",
-institution_email: "",
-institution_phone: "",
-institution_address: "",
-student_id_prefix: "STU",
-email_notifications: true,
+  // ==========================================
+  // STATES
+  // ==========================================
 
+  const [email, setEmail] =
+    useState(
+      localStorage.getItem(
+        "adminEmail"
+      ) || "admin@gmail.com"
+    );
 
-  // Admin Details
-  admin_name: "",
-  admin_email: "",
-  admin_phone: "",
-  admin_role: "Administrator",
-  admin_avatar: "",
+  const [currentPassword, setCurrentPassword] =
+    useState("");
 
-});
+  const [newPassword, setNewPassword] =
+    useState("");
 
-useEffect(() => {
-fetchSettings();
-}, []);
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
 
-const fetchSettings = async () => {
-try {
-const res = await axios.get(API_URL);
+  const [showCurrent, setShowCurrent] =
+    useState(false);
 
-  setSettings((prev) => ({
-    ...prev,
-    ...res.data,
-  }));
-} catch (err) {
-  console.error(err);
-} finally {
-  setFetching(false);
-}
+  const [showNew, setShowNew] =
+    useState(false);
 
-};
+  const [showConfirm, setShowConfirm] =
+    useState(false);
 
-const handleChange = (e) => {
-const { name, value, checked, type } = e.target;
+  const [loading, setLoading] =
+    useState(false);
 
-setSettings((prev) => ({
-  ...prev,
-  [name]: type === "checkbox" ? checked : value,
-}));
+  // ==========================================
+  // HANDLE SAVE
+  // ==========================================
 
-};
+  const handleSave = async (e) => {
 
-const saveSettings = async () => {
-try {
-setLoading(true);
+    e.preventDefault();
 
-  await axios.put(API_URL, settings);
+    const savedPassword =
+      localStorage.getItem(
+        "adminPassword"
+      ) || "123456";
 
-  alert("Settings Updated Successfully");
-} catch (err) {
-  console.error(err);
-  alert("Failed To Update Settings");
-} finally {
-  setLoading(false);
-}
-};
-if (fetching) {
-return ( <div className="h-screen flex items-center justify-center"> <Loader2
-       className="animate-spin text-blue-600"
-       size={40}
-     /> </div>
-);
-}
-return ( <div className="min-h-screen bg-gray-50">
+    // CHECK CURRENT PASSWORD
 
-  {/* Header */}
-  <div className="bg-white border-b">
+    if (
+      currentPassword !== savedPassword
+    ) {
+      errorToast(
+        "Current password is incorrect"
+      );
+      return;
+    }
 
-    <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+    // CHECK PASSWORD MATCH
 
-      <div className="flex items-center gap-3">
-        <div className="p-2 bg-blue-100 rounded-xl">
-          <Settings
-            size={22}
-            className="text-blue-600"
-          />
-        </div>
+    if (
+      newPassword !== confirmPassword
+    ) {
+      errorToast(
+        "Passwords do not match"
+      );
+      return;
+    }
 
-        <div>
-          <h1 className="text-2xl font-bold">
-            Admin Settings
-          </h1>
+    // CHECK PASSWORD LENGTH
 
-          <p className="text-gray-500 text-sm">
-            Manage institution preferences
-          </p>
-        </div>
-      </div>
+    if (newPassword.length < 6) {
+      errorToast(
+        "Minimum 6 characters required"
+      );
+      return;
+    }
 
-      <button
-        onClick={saveSettings}
-        disabled={loading}
-        className="bg-black text-white px-5 py-2.5 rounded-xl flex items-center gap-2 hover:opacity-90"
+    setLoading(true);
+
+    try {
+
+      // ======================================
+      // SAVE TO LOCAL STORAGE
+      // ======================================
+
+      localStorage.setItem(
+        "adminEmail",
+        email
+      );
+
+      localStorage.setItem(
+        "adminPassword",
+        newPassword
+      );
+
+      // ======================================
+      // OPTIONAL BACKEND API
+      // ======================================
+
+      /*
+      await axios.put(
+        "http://localhost:5001/admin/settings",
+        {
+          email,
+          password: newPassword,
+        }
+      );
+      */
+
+      successToast(
+        "Email & Password Updated Successfully ✅"
+      );
+
+      // CLEAR FIELDS
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+
+    } catch (error) {
+
+      errorToast(
+        "Failed to update settings"
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+  return (
+
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200 flex items-center justify-center p-6">
+
+      <motion.div
+
+        initial={{
+          opacity: 0,
+          y: 40,
+        }}
+
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+
+        transition={{
+          duration: 0.5,
+        }}
+
+        className="w-full max-w-2xl"
+
       >
-        {loading ? (
-          <>
-            <Loader2
-              size={16}
-              className="animate-spin"
-            />
-            Saving...
-          </>
-        ) : (
-          <>
-            <Save size={16} />
-            Save Changes
-          </>
-        )}
-      </button>
-      
+
+        {/* CARD */}
+
+        <div className="bg-white rounded-[35px] shadow-2xl border border-slate-200 overflow-hidden">
+
+          {/* HEADER */}
+
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8">
+
+            <div className="flex items-center gap-5">
+
+              <div className="w-20 h-20 rounded-3xl bg-white/20 flex items-center justify-center backdrop-blur-lg">
+
+                <UserCog className="w-10 h-10 text-white" />
+
+              </div>
+
+              <div>
+
+                <h1 className="text-4xl font-bold text-white">
+                  Security Settings
+                </h1>
+
+                <p className="text-blue-100 mt-2">
+                  Update admin email & password
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* FORM */}
+
+          <form
+            onSubmit={handleSave}
+            className="p-8 space-y-6"
+          >
+
+            {/* EMAIL */}
+
+            <div>
+
+              <label className="text-sm font-semibold text-slate-700 mb-3 block">
+                Admin Email
+              </label>
+
+              <div className="relative">
+
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) =>
+                    setEmail(
+                      e.target.value
+                    )
+                  }
+                  placeholder="Enter admin email"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                />
+
+              </div>
+
+            </div>
+
+            {/* CURRENT PASSWORD */}
+
+            <div>
+
+              <label className="text-sm font-semibold text-slate-700 mb-3 block">
+                Current Password
+              </label>
+
+              <div className="relative">
+
+                <Shield className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+
+                <input
+                  type={
+                    showCurrent
+                      ? "text"
+                      : "password"
+                  }
+                  required
+                  value={currentPassword}
+                  onChange={(e) =>
+                    setCurrentPassword(
+                      e.target.value
+                    )
+                  }
+                  placeholder="Current password"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-14 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowCurrent(
+                      !showCurrent
+                    )
+                  }
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"
+                >
+
+                  {showCurrent ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+
+                </button>
+
+              </div>
+
+            </div>
+
+            {/* NEW PASSWORD */}
+
+            <div>
+
+              <label className="text-sm font-semibold text-slate-700 mb-3 block">
+                New Password
+              </label>
+
+              <div className="relative">
+
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+
+                <input
+                  type={
+                    showNew
+                      ? "text"
+                      : "password"
+                  }
+                  required
+                  value={newPassword}
+                  onChange={(e) =>
+                    setNewPassword(
+                      e.target.value
+                    )
+                  }
+                  placeholder="New password"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-14 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowNew(
+                      !showNew
+                    )
+                  }
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"
+                >
+
+                  {showNew ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+
+                </button>
+
+              </div>
+
+            </div>
+
+            {/* CONFIRM PASSWORD */}
+
+            <div>
+
+              <label className="text-sm font-semibold text-slate-700 mb-3 block">
+                Confirm Password
+              </label>
+
+              <div className="relative">
+
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+
+                <input
+                  type={
+                    showConfirm
+                      ? "text"
+                      : "password"
+                  }
+                  required
+                  value={confirmPassword}
+                  onChange={(e) =>
+                    setConfirmPassword(
+                      e.target.value
+                    )
+                  }
+                  placeholder="Confirm password"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-14 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowConfirm(
+                      !showConfirm
+                    )
+                  }
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"
+                >
+
+                  {showConfirm ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+
+                </button>
+
+              </div>
+
+            </div>
+
+            {/* SAVE BUTTON */}
+
+            <motion.button
+
+              whileHover={{
+                scale: 1.02,
+              }}
+
+              whileTap={{
+                scale: 0.98,
+              }}
+
+              type="submit"
+
+              disabled={loading}
+
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90 text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-3 shadow-lg transition"
+
+            >
+
+              {loading ? (
+
+                <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+
+              ) : (
+
+                <>
+                  <Save className="w-5 h-5" />
+                  Save Settings
+                </>
+
+              )}
+
+            </motion.button>
+
+          </form>
+
+        </div>
+
+      </motion.div>
+
     </div>
 
-  </div>
+  );
 
-  <div className="max-w-5xl mx-auto p-6">
-
-    {/* General Section */}
-    <div className="bg-white border rounded-2xl p-6 mb-6">
-
-      <h2 className="font-semibold text-lg mb-5">
-        Institution Information
-      </h2>
-
-      <div className="grid md:grid-cols-2 gap-5">
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">
-            Institution Name
-          </label>
-
-          <div className="relative">
-            <Building2
-              size={18}
-              className="absolute left-3 top-3.5 text-gray-400"
-            />
-
-            <input
-              type="text"
-              name="institution_name"
-              value={settings.institution_name}
-              onChange={handleChange}
-              className="w-full border rounded-xl p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">
-            Email Address
-          </label>
-
-          <div className="relative">
-            <Mail
-              size={18}
-              className="absolute left-3 top-3.5 text-gray-400"
-            />
-
-            <input
-              type="email"
-              name="institution_email"
-              value={settings.institution_email}
-              onChange={handleChange}
-              className="w-full border rounded-xl p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">
-            Phone Number
-          </label>
-
-          <div className="relative">
-            <Phone
-              size={18}
-              className="absolute left-3 top-3.5 text-gray-400"
-            />
-
-            <input
-              type="text"
-              name="institution_phone"
-              value={settings.institution_phone}
-              onChange={handleChange}
-              className="w-full border rounded-xl p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-2 block">
-            Student ID Prefix
-          </label>
-
-          <div className="relative">
-            <Users
-              size={18}
-              className="absolute left-3 top-3.5 text-gray-400"
-            />
-
-            <input
-              type="text"
-              name="student_id_prefix"
-              value={settings.student_id_prefix}
-              onChange={handleChange}
-              className="w-full border rounded-xl p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-
-      </div>
-
-      <div className="mt-5">
-        <label className="text-sm font-medium mb-2 block">
-          Institution Address
-        </label>
-
-        <div className="relative">
-          <MapPin
-            size={18}
-            className="absolute left-3 top-3.5 text-gray-400"
-          />
-
-          <textarea
-            rows={4}
-            name="institution_address"
-            value={settings.institution_address}
-            onChange={handleChange}
-            className="w-full border rounded-xl p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-      </div>
-
-    </div>
-
-    {/* Notifications Section */}
-    <div className="bg-white border rounded-2xl p-6">
-
-      <h2 className="font-semibold text-lg mb-5">
-        Notifications
-      </h2>
-
-      <div className="flex items-center justify-between">
-
-        <div>
-          <h3 className="font-medium">
-            Email Notifications
-          </h3>
-
-          <p className="text-sm text-gray-500">
-            Receive updates and alerts by email
-          </p>
-        </div>
-
-        <label className="relative inline-flex items-center cursor-pointer">
-
-          <input
-            type="checkbox"
-            name="email_notifications"
-            checked={settings.email_notifications}
-            onChange={handleChange}
-            className="sr-only peer"
-          />
-
-          <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 after:absolute after:left-[2px] after:top-[2px] after:bg-white after:h-5 after:w-5 after:rounded-full after:transition-all peer-checked:after:translate-x-full">
-          </div>
-
-        </label>
-
-      </div>
-
-    </div>
-
-
-
-    {/* Notifications Section */}
-    <div className="bg-white border rounded-2xl p-6">
-
-      <div className="flex items-center justify-between">
-
-        <div>
-          <h3 className="font-medium">
-            SMS Notifications
-          </h3>
-
-          <p className="text-sm text-gray-500">
-            Receive updates and alerts by sms
-          </p>
-        </div>
-
-        <label className="relative inline-flex items-center cursor-pointer">
-
-          <input
-            type="checkbox"
-            name="sms_notifications"
-            checked={settings.sms_notifications}
-            onChange={handleChange}
-            className="sr-only peer"
-          />
-          <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 after:absolute after:left-[2px] after:top-[2px] after:bg-white after:h-5 after:w-5 after:rounded-full after:transition-all peer-checked:after:translate-x-full">
-          </div>
-
-        </label>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  
-
-
-
-
-
-
-</div>
-
-);
 }

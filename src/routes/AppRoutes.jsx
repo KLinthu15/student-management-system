@@ -5,15 +5,13 @@ import LandingPage from "../pages/LandingPage";
 import AdminLoginPage from "../pages/AdminLoginPage";
 
 import AdminLayout from "../layout/AdminLayout";
-
+import ResetPasswordPage from "../pages/ResetPasswordPage";
 import DashboardPage from "../pages/DashboardPage";
 import StudentsPage from "../pages/StudentsPage";
 import Courses from "../pages/Courses";
 import AttendancePage from "../pages/Attendancepage";
 import ResultSheetPage from "../pages/ResultSheetPage";
-import Notifications from "../pages/Notifications";
 import SettingsPage from "../pages/SettingPage";
-import AssignmentPage from "../pages/AssignmentPage";
 
 export default function AppRoutes() {
   return (
@@ -56,20 +54,19 @@ export default function AppRoutes() {
           element={<ResultSheetPage />}
         />
 
-        <Route
-          path="notifications"
-          element={<Notifications />}
-        />
 
         <Route
           path="settings"
           element={<SettingsPage />}
         />
+  <Route
+      path="/admin/forgot-password"
+      element={<ResetPasswordPage />}
+    />
 
-        <Route
-          path="assignment"
-          element={<AssignmentPage />}
-        />
+
+
+
 
       </Route>
 

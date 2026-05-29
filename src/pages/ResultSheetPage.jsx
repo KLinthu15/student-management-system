@@ -39,20 +39,23 @@ export default function ResultSheetPage() {
 
       const students =
         response.data.data || [];
+const formatted = students.map(
+  (student) => ({
+    ...student,
 
-      const formatted =
-        students.map((student) => ({
-          ...student,
+    name:
+      `${student.first_name} ${student.last_name}`,
 
-          name:
-            `${student.first_name} ${student.last_name}`,
+    marks:
+      student.results?.[0]?.marks || "",
 
-          marks: "",
+    gpa:
+      student.results?.[0]?.gpa || "",
 
-          gpa: "",
-
-          result: "",
-        }));
+    result:
+      student.results?.[0]?.result || "",
+  })
+);
 
       setResults(formatted);
 
@@ -132,7 +135,7 @@ export default function ResultSheetPage() {
         }
       );
 
-      alert("Result Saved");
+      alert("Result Saved Successfully ✅ ");
 
     } catch (error) {
 
@@ -166,8 +169,8 @@ export default function ResultSheetPage() {
 
           course: student.course,
 
-          semester:
-            student.semester,
+          batch:
+            student.batch,
 
           marks: student.marks,
 
@@ -177,7 +180,7 @@ export default function ResultSheetPage() {
         }
       );
 
-      alert("Email Sent");
+      alert("Email Sent Successfully ✅ ");
 
     } catch (error) {
 
@@ -264,7 +267,7 @@ export default function ResultSheetPage() {
 
                 <th>Course</th>
 
-                <th>Semester</th>
+                <th>Batch</th>
 
                 <th>Marks</th>
 
@@ -306,7 +309,7 @@ export default function ResultSheetPage() {
 
                     <td>
                       {
-                        student.semester
+                        student.batch
                       }
                     </td>
 
